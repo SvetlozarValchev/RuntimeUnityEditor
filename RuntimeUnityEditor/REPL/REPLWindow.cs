@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
-using BepInEx.Logging;
 using RuntimeUnityEditor.REPL.MCS;
 using RuntimeUnityEditor.Utils;
 using UnityEngine;
@@ -64,7 +63,7 @@ namespace RuntimeUnityEditor.REPL
                     })
                 .Where(x => x.IsPublic && !string.IsNullOrEmpty(x.Namespace))
                 .Select(x => x.Namespace));
-            BepInEx.Logger.Log(LogLevel.Debug, $"[REPL] Found {_namespaces.Count} public namespaces");
+            Debug.Log($"[REPL] Found {_namespaces.Count} public namespaces");
         }
 
         public void DisplayWindow()
@@ -220,7 +219,7 @@ namespace RuntimeUnityEditor.REPL
             }
             catch (Exception ex)
             {
-                BepInEx.Logger.Log(LogLevel.Debug, "[REPL] " + ex);
+                Debug.Log("[REPL] " + ex);
                 ClearSuggestions();
             }
         }

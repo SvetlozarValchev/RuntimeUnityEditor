@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using BepInEx;
-using BepInEx.Logging;
 
 namespace RuntimeUnityEditor.Inspector.Entries
 {
@@ -66,7 +64,7 @@ namespace RuntimeUnityEditor.Inspector.Entries
             }
             catch (Exception ex)
             {
-                Logger.Log(LogLevel.Warning, $"[CheatTools] Failed to evaluate the method {Name()} - {ex.Message}");
+                UnityEngine.Debug.Log($"[CheatTools] Failed to evaluate the method {Name()} - {ex.Message}");
                 _valueCache = ex;
                 return null;
             }

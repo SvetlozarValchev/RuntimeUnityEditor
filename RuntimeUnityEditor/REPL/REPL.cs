@@ -19,7 +19,6 @@ namespace RuntimeUnityEditor.REPL
         static REPL()
         {
             go = new GameObject("UnityREPL");
-            go.transform.parent = BepInEx.Bootstrap.Chainloader.ManagerObject.transform;
             MB = go.AddComponent<ReplHelper>();
         }
 
@@ -144,7 +143,7 @@ namespace RuntimeUnityEditor.REPL
         [Documentation("geti() - get object currently opened in inspector. Will get expanded upon accepting. Best to use like this: var x = geti()")]
         public static object geti()
         {
-            return RuntimeUnityEditor.Instance.Inspector.GetInspectedObject()
+            return RuntimeUnityEditor.Inspector.GetInspectedObject()
                 ?? throw new InvalidOperationException("No object is opened in inspector or a static type is opened");
         }
 
@@ -158,7 +157,7 @@ namespace RuntimeUnityEditor.REPL
         public static void seti(object obj)
         {
             if (obj == null) throw new ArgumentNullException(nameof(obj));
-            RuntimeUnityEditor.Instance.Inspector.InspectorPush(new InstanceStackEntry(obj, "REPL > " + obj.GetType().Name));
+            RuntimeUnityEditor.Inspector.InspectorPush(new InstanceStackEntry(obj, "REPL > " + obj.GetType().Name));
         }
 
         [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property)]

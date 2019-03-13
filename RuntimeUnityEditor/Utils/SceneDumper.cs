@@ -3,9 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Reflection;
 using System.Text;
-using BepInEx.Logging;
 using UnityEngine;
-using Logger = BepInEx.Logger;
 
 namespace RuntimeUnityEditor.Utils
 {
@@ -14,7 +12,7 @@ namespace RuntimeUnityEditor.Utils
         public static void DumpObjects(params GameObject[] objects)
         {
             var fname = Path.GetTempFileName() + ".txt";
-            Logger.CurrentLogger.Log(LogLevel.Info, $"Dumping {objects.Length} GameObjects to {fname}");
+            UnityEngine.Debug.Log($"Dumping {objects.Length} GameObjects to {fname}");
             using (var f = File.OpenWrite(fname))
             using (var sw = new StreamWriter(f, Encoding.UTF8))
             {
@@ -22,7 +20,7 @@ namespace RuntimeUnityEditor.Utils
                     PrintRecursive(sw, obj);
             }
             var pi = new ProcessStartInfo(fname) { UseShellExecute = true };
-            Logger.CurrentLogger.Log(LogLevel.Info, $"Opening {fname}");
+            UnityEngine.Debug.Log($"Opening {fname}");
             Process.Start(pi);
         }
 
@@ -50,7 +48,7 @@ namespace RuntimeUnityEditor.Utils
                     }
                     catch (Exception e)
                     {
-                        Logger.Log(LogLevel.Debug, e);
+                        UnityEngine.Debug.Log(e);
                     }
                 }
             }

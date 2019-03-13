@@ -2,9 +2,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using BepInEx.Logging;
 using RuntimeUnityEditor.Inspector.Entries;
-using Logger = BepInEx.Logger;
 
 namespace RuntimeUnityEditor
 {
@@ -25,7 +23,7 @@ namespace RuntimeUnityEditor
                     if (File.Exists(_dnSpyPath) && _dnSpyPath.EndsWith("dnspy.exe", StringComparison.OrdinalIgnoreCase))
                         IsAvailable = true;
                     else
-                        Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe");
+                        UnityEngine.Debug.LogError("[DnSpyHelper] Invalid dnSpy path. The path has to point to 64bit dnSpy.exe");
                 }
             }
         }
@@ -59,12 +57,12 @@ namespace RuntimeUnityEditor
             try
             {
                 var refString = GetDnspyArgs(entry);
-                Logger.Log(LogLevel.Info, $"[DnSpyHelper] Opening {DnSpyPath} {refString}");
+                UnityEngine.Debug.Log($"[DnSpyHelper] Opening {DnSpyPath} {refString}");
                 Process.Start(DnSpyPath, refString);
             }
             catch (Exception e)
             {
-                Logger.Log(LogLevel.Error | LogLevel.Message, "[DnSpyHelper] " + e.Message);
+                UnityEngine.Debug.LogError("[DnSpyHelper] " + e.Message);
             }
         }
     }

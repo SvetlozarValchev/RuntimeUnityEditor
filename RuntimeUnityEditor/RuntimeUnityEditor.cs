@@ -1,38 +1,21 @@
-﻿using System.ComponentModel;
-using System.Xml;
-using BepInEx;
+﻿using System.Reflection;
+using System.ComponentModel;
 using RuntimeUnityEditor.ObjectTree;
 using RuntimeUnityEditor.REPL;
 using UnityEngine;
+using UnityModManagerNet;
+using Harmony12;
 
 namespace RuntimeUnityEditor
 {
-    [BepInPlugin("RuntimeUnityEditor", "Runtime Unity Editor", Version)]
-    public class RuntimeUnityEditor : BaseUnityPlugin
+    static class RuntimeUnityEditor
     {
-        public const string Version = "1.2";
+        public static Inspector.Inspector Inspector { get; private set; }
+        public static ObjectTreeViewer TreeViewer { get; private set; }
+        public static ReplWindow Repl { get; private set; }
 
-        [DisplayName("Path to dnSpy.exe")]
-        [Description("Full path to dnSpy that will enable integration with Inspector.\n\n" +
-                     "When correctly configured, you will see a new ^ buttons that will open the members in dnSpy.")]
-        public ConfigWrapper<string> DnSpyPath { get; private set; }
-
-        public Inspector.Inspector Inspector { get; private set; }
-        public ObjectTreeViewer TreeViewer { get; private set; }
-        public ReplWindow Repl { get; private set; }
-
-        internal static RuntimeUnityEditor Instance { get; private set; }
-        
-        protected void Awake()
+        static bool Load(UnityModManager.ModEntry modEntry)
         {
-            new XmlDocument().CreateComment("Test if System.XML is available (REPL fails with no message without it)");
-
-            Instance = this;
-
-            DnSpyPath = new ConfigWrapper<string>(nameof(DnSpyPath), this);
-            DnSpyPath.SettingChanged += (sender, args) => DnSpyHelper.DnSpyPath = DnSpyPath.Value;
-            DnSpyHelper.DnSpyPath = DnSpyPath.Value;
-
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform));
             TreeViewer = new ObjectTreeViewer(items =>
             {
@@ -42,24 +25,18 @@ namespace RuntimeUnityEditor
             });
 
             Repl = new ReplWindow();
+            
+            modEntry.OnUpdate = OnUpdate;
 
-            DnSpyPath = new ConfigWrapper<string>(nameof(DnSpyPath), this);
-            DnSpyPath.SettingChanged += (sender, args) => DnSpyHelper.DnSpyPath = DnSpyPath.Value;
-            DnSpyHelper.DnSpyPath = DnSpyPath.Value;
-        }
+            //Patches
+            var harmony = HarmonyInstance.Create(modEntry.Info.Id);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
 
-        protected void OnGUI()
-        {
-            if (Show)
-            {
-                Inspector.DisplayInspector();
-                TreeViewer.DisplayViewer();
-                Repl.DisplayWindow();
-            }
+            return true;
         }
 
         [Browsable(false)]
-        public bool Show
+        public static bool Show
         {
             get => TreeViewer.Enabled;
             set
@@ -75,7 +52,7 @@ namespace RuntimeUnityEditor
             }
         }
 
-        protected void Update()
+        static void OnUpdate(UnityModManager.ModEntry modEntry, float dt)
         {
             if (Input.GetKeyDown(KeyCode.F12))
             {
@@ -85,7 +62,7 @@ namespace RuntimeUnityEditor
             Inspector.InspectorUpdate();
         }
 
-        private void SetWindowSizes()
+        static void SetWindowSizes()
         {
             const int screenOffset = 10;
 
@@ -100,25 +77,39 @@ namespace RuntimeUnityEditor
 
             var inspectorHeight = (int)(screenRect.height / 4) * 3;
             Inspector.UpdateWindowSize(new Rect(
-                centerX, 
-                screenRect.yMin, 
-                centerWidth, 
+                centerX,
+                screenRect.yMin,
+                centerWidth,
                 inspectorHeight));
 
             var rightWidth = 350;
             var treeViewHeight = screenRect.height;
             TreeViewer.UpdateWindowSize(new Rect(
-                screenRect.xMax - rightWidth, 
-                screenRect.yMin, 
-                rightWidth, 
+                screenRect.xMax - rightWidth,
+                screenRect.yMin,
+                rightWidth,
                 treeViewHeight));
 
             var replPadding = 8;
             Repl.UpdateWindowSize(new Rect(
-                centerX, 
-                screenRect.yMin + inspectorHeight + replPadding, 
-                centerWidth, 
+                centerX,
+                screenRect.yMin + inspectorHeight + replPadding,
+                centerWidth,
                 screenRect.height - inspectorHeight - replPadding));
+        }
+    }
+
+    [HarmonyPatch(typeof(UnityModManager.UI), "OnGUI")]
+    class UnityModManagerUI_OnGUI_Patch
+    {
+        static void Postfix(UnityModManager.UI __instance)
+        {
+            if (RuntimeUnityEditor.Show)
+            {
+                RuntimeUnityEditor.Inspector.DisplayInspector();
+                RuntimeUnityEditor.TreeViewer.DisplayViewer();
+                RuntimeUnityEditor.Repl.DisplayWindow();
+            }
         }
     }
 }
