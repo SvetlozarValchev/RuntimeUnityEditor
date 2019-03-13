@@ -16,9 +16,9 @@ In-game inspector, editor and interactive console for applications made with Uni
 
 ### How to use
 - This is a Unity Mod Manager mod. It requires Unity Mod Manager. Grab it from [here](https://www.nexusmods.com/site/mods/21/) and follow installation instructions.
-- Download the latest build from the [Releases](https://github.com/ManlyMarco/RuntimeUnityEditor/releases) page.
+- Download the latest build from the [Releases](https://github.com/SvetlozarValchev/RuntimeUnityEditor/releases) page.
 - Install the Editor using Unity Mod Manager or manually by extracting the build into Mods folder of the game directory.
-- Download msc.dll from [Releases](https://github.com/ManlyMarco/RuntimeUnityEditor/releases) page and put it into game directory's GameName_Data/Managed
+- Download msc.dll from [Releases](https://github.com/SvetlozarValchev/RuntimeUnityEditor/releases) page and put it into game directory's GameName_Data/Managed
 - To turn on press the F12 key when in-game. A window should appear on top of the game. If it doesn't appear, check logs for errors.
 
 You can support development of the original author's plugins through his Patreon page: https://www.patreon.com/ManlyMarco
