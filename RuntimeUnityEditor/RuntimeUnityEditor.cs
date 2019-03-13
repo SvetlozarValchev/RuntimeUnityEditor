@@ -1,4 +1,5 @@
 ﻿using System.Reflection;
+using System.Xml;
 using System.ComponentModel;
 using RuntimeUnityEditor.ObjectTree;
 using RuntimeUnityEditor.REPL;
@@ -8,14 +9,53 @@ using Harmony12;
 
 namespace RuntimeUnityEditor
 {
-    static class RuntimeUnityEditor
+    static class Main
     {
         public static Inspector.Inspector Inspector { get; private set; }
         public static ObjectTreeViewer TreeViewer { get; private set; }
         public static ReplWindow Repl { get; private set; }
 
+        public static bool init = false;
+
         static bool Load(UnityModManager.ModEntry modEntry)
         {
+            //Patches
+            var harmony = HarmonyInstance.Create(modEntry.Info.Id);
+            harmony.PatchAll(Assembly.GetExecutingAssembly());
+
+            modEntry.OnUpdate = OnUpdate;
+
+            return true;
+        }
+
+        static void OnUpdate(UnityModManager.ModEntry modEntry, float dt)
+        {
+            if (!init && Input.GetKeyDown(KeyCode.F12))
+            {
+                init = true;
+                var main = new GameObject();
+
+                main.AddComponent<RuntimeUnityEditor>();
+
+                RuntimeUnityEditor.Instance.Show = true;
+            }
+        }
+    }
+
+    public class RuntimeUnityEditor : MonoBehaviour
+    {
+        public Inspector.Inspector Inspector { get; private set; }
+        public ObjectTreeViewer TreeViewer { get; private set; }
+        public ReplWindow Repl { get; private set; }
+
+        internal static RuntimeUnityEditor Instance { get; private set; }
+
+        protected void Awake()
+        {
+            new XmlDocument().CreateComment("Test if System.XML is available (REPL fails with no message without it)");
+
+            Instance = this;
+
             Inspector = new Inspector.Inspector(targetTransform => TreeViewer.SelectAndShowObject(targetTransform));
             TreeViewer = new ObjectTreeViewer(items =>
             {
@@ -25,18 +65,20 @@ namespace RuntimeUnityEditor
             });
 
             Repl = new ReplWindow();
-            
-            modEntry.OnUpdate = OnUpdate;
+        }
 
-            //Patches
-            var harmony = HarmonyInstance.Create(modEntry.Info.Id);
-            harmony.PatchAll(Assembly.GetExecutingAssembly());
-
-            return true;
+        void OnGUI()
+        {
+            if (Show)
+            {
+                Inspector.DisplayInspector();
+                TreeViewer.DisplayViewer();
+                Repl.DisplayWindow();
+            }
         }
 
         [Browsable(false)]
-        public static bool Show
+        public bool Show
         {
             get => TreeViewer.Enabled;
             set
@@ -52,7 +94,7 @@ namespace RuntimeUnityEditor
             }
         }
 
-        static void OnUpdate(UnityModManager.ModEntry modEntry, float dt)
+        void Update()
         {
             if (Input.GetKeyDown(KeyCode.F12))
             {
@@ -62,7 +104,7 @@ namespace RuntimeUnityEditor
             Inspector.InspectorUpdate();
         }
 
-        static void SetWindowSizes()
+        private void SetWindowSizes()
         {
             const int screenOffset = 10;
 
@@ -96,20 +138,6 @@ namespace RuntimeUnityEditor
                 screenRect.yMin + inspectorHeight + replPadding,
                 centerWidth,
                 screenRect.height - inspectorHeight - replPadding));
-        }
-    }
-
-    [HarmonyPatch(typeof(UnityModManager.UI), "OnGUI")]
-    class UnityModManagerUI_OnGUI_Patch
-    {
-        static void Postfix(UnityModManager.UI __instance)
-        {
-            if (RuntimeUnityEditor.Show)
-            {
-                RuntimeUnityEditor.Inspector.DisplayInspector();
-                RuntimeUnityEditor.TreeViewer.DisplayViewer();
-                RuntimeUnityEditor.Repl.DisplayWindow();
-            }
         }
     }
 }

@@ -151,7 +151,7 @@ namespace RuntimeUnityEditor.Inspector
             }
             catch (Exception ex)
             {
-                Debug.Log("[Inspector] CacheFields crash: " + ex);
+                UnityEngine.Debug.Log("[Inspector] CacheFields crash: " + ex);
             }
         }
 
@@ -168,7 +168,7 @@ namespace RuntimeUnityEditor.Inspector
             }
             catch (Exception ex)
             {
-                Debug.Log("[Inspector] CacheFields crash: " + ex);
+                UnityEngine.Debug.Log("[Inspector] CacheFields crash: " + ex);
             }
         }
 
@@ -226,7 +226,7 @@ namespace RuntimeUnityEditor.Inspector
                     }
                     catch (Exception ex)
                     {
-                        Debug.LogError("[Inspector] Failed to set value - " + ex.Message);
+                        UnityEngine.Debug.Log("[Inspector] Failed to set value - " + ex.Message);
                     }
                 }
                 else
@@ -381,7 +381,7 @@ namespace RuntimeUnityEditor.Inspector
             }
             catch (Exception ex)
             {
-                Debug.LogError("[Inspector] GUI crash: " + ex);
+                UnityEngine.Debug.Log("[Inspector] GUI crash: " + ex);
                 InspectorClear();
             }
 

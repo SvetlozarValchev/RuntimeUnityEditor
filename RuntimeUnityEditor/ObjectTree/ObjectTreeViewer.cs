@@ -28,7 +28,7 @@ namespace RuntimeUnityEditor.ObjectTree
         private bool _enabled;
         private List<GameObject> _cachedRootGameObjects;
         private readonly Dictionary<Image, Texture2D> _imagePreviewCache = new Dictionary<Image, Texture2D>();
-        private readonly GUILayoutOption _drawVector3FieldWidth = GUILayout.Width(38);
+        private readonly GUILayoutOption _drawVector3FieldWidth = GUILayout.Width(76);
         private readonly GUILayoutOption _drawVector3FieldHeight = GUILayout.Height(19);
         private readonly GUILayoutOption _drawVector3SliderHeight = GUILayout.Height(10);
         private readonly GUILayoutOption _drawVector3SliderWidth = GUILayout.Width(33);
@@ -161,9 +161,7 @@ namespace RuntimeUnityEditor.ObjectTree
             GUILayout.BeginVertical();
             {
                 DisplayObjectTree();
-
                 DisplayControls();
-
                 DisplayObjectProperties();
             }
             GUILayout.EndHorizontal();
@@ -267,38 +265,35 @@ namespace RuntimeUnityEditor.ObjectTree
         {
             var v3 = get();
             var v3New = v3;
+            bool parsed1, parsed2, parsed3;
 
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Label(name, GUILayout.ExpandWidth(true), _drawVector3FieldHeight);
-                v3New.x = GUILayout.HorizontalSlider(v3.x, minVal, maxVal, _drawVector3SliderWidth, _drawVector3SliderHeight);
-                float.TryParse(GUILayout.TextField(v3New.x.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.x);
-                v3New.y = GUILayout.HorizontalSlider(v3.y, minVal, maxVal, _drawVector3SliderWidth, _drawVector3SliderHeight);
-                float.TryParse(GUILayout.TextField(v3New.y.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.y);
-                v3New.z = GUILayout.HorizontalSlider(v3.z, minVal, maxVal, _drawVector3SliderWidth, _drawVector3SliderHeight);
-                float.TryParse(GUILayout.TextField(v3New.z.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.z);
+                parsed1 = float.TryParse(GUILayout.TextField(v3New.x.ToString("0.00000"), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.x);
+                parsed2 = float.TryParse(GUILayout.TextField(v3New.y.ToString("0.00000"), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.y);
+                parsed3 = float.TryParse(GUILayout.TextField(v3New.z.ToString("0.00000"), _drawVector3FieldWidth, _drawVector3FieldHeight), out v3New.z);
             }
             GUILayout.EndHorizontal();
-
-            if (v3 != v3New) set(v3New);
+            
+            if (parsed1 && parsed2 && parsed3 && v3 != v3New) set(v3New);
         }
 
         private void DrawVector2(string name, Action<Vector2> set, Func<Vector2> get, float minVal, float maxVal)
         {
             var vector2 = get();
             var vector2New = vector2;
+            bool parsed1, parsed2;
 
             GUILayout.BeginHorizontal();
             {
                 GUILayout.Label(name, GUILayout.ExpandWidth(true), _drawVector3FieldHeight);
-                vector2New.x = GUILayout.HorizontalSlider(vector2.x, minVal, maxVal, _drawVector3SliderWidth, _drawVector3SliderHeight);
-                float.TryParse(GUILayout.TextField(vector2New.x.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth, _drawVector3FieldHeight), out vector2New.x);
-                vector2New.y = GUILayout.HorizontalSlider(vector2.y, minVal, maxVal, _drawVector3SliderWidth, _drawVector3SliderHeight);
-                float.TryParse(GUILayout.TextField(vector2New.y.ToString("F2", CultureInfo.InvariantCulture), _drawVector3FieldWidth, _drawVector3FieldHeight), out vector2New.y);
+                parsed1 = float.TryParse(GUILayout.TextField(vector2New.x.ToString("0.00000"), _drawVector3FieldWidth, _drawVector3FieldHeight), out vector2New.x);
+                parsed2 = float.TryParse(GUILayout.TextField(vector2New.y.ToString("0.00000"), _drawVector3FieldWidth, _drawVector3FieldHeight), out vector2New.y);
             }
             GUILayout.EndHorizontal();
 
-            if (vector2 != vector2New) set(vector2New);
+            if (parsed1 && parsed2 && vector2 != vector2New) set(vector2New);
         }
 
         private void DrawSingleComponent(Component component)
